@@ -1,0 +1,12 @@
+#Create Sample Application
+root# composer create-project --prefer-dist cakephp/app bookmarker
+
+#check installation app
+bin/cake server
+
+
+/var/lib/pqsql/data/pg_hba.conf
+
+
+
+

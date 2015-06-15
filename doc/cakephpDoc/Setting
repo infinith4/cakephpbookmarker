@@ -1,0 +1,175 @@
+
+visudo で
+root ALL=(ALL) ALL の下に
+tashiro ALL=(ALL) ALL
+を記述。
+
+vi /etc/yum.repos.d/CentOS-Base.repo 
+
+sudo yum clean all
+sudo yum install -y emacs
+sudo yum install -y gcc gcc-c++
+
+
+#Apache install
+sudo yum install -y httpd httpd-devel
+sudo service httpd start
+sudo chkconfig httpd on
+
+# httpd.confを編集
+sudo emacs /etc/httpd/conf/httpd.conf 
+#####/etc/httpd/conf/httpd.conf ####
+# 276行目あたり
+# ServerNameのコメントアウトを外しておく
+# 試験環境なのでServerNameは設定せず...
+#ServerName www.example.com:80
+ServerName www.example.com:80
+
+# 330行目あたりから
+# DocumentRootの設定にて
+
+# Options Indexesを変更
+Options All
+
+# AllowOverrideを変更
+AllowOverride All
+#########################################
+
+[tashiro@localhost ~]$ httpd -t
+Syntax OK
+[tashiro@localhost ~]$ sudo service httpd restart
+httpd を停止中:                                            [  OK  ]
+httpd を起動中:                                            [  OK  ]
+
+rpm -qa | grep php
+
+wget https://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/epel-release-6-5.noarch.rpm
+sudo rpm -ivh epel-release-6-5.noarch.rpm
+
+wget http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/ius-release-1.0-14.ius.centos6.noarch.rpm
+sudo rpm -ivh ius-release-1.0-14.ius.centos6.noarch.rpm
+
+sudo yum -y install php54-cli php54-pdo php54-mysql php54-common php54 php54-cgi php54-fpm php54-devel php54-gd php54-mbstring php54-odbc php54-pear php54-snmp php54-bcmath php54-xmlrpc php54-tidy php54-xml php54-mssql php54-soap php54-pgsql php54-intl
+
+[tashiro@localhost ~]$ php -v
+PHP 5.4.41 (cli) (built: May 15 2015 09:22:55) 
+Copyright (c) 1997-2014 The PHP Group
+Zend Engine v2.4.0, Copyright (c) 1998-2014 Zend Technologies
+
+
+curl -s https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+root# cd /var/www/html
+[root@localhost html]# composer create-project --prefer-dist cakephp/app cakeapp1
+No log handling enabled - turning on stderr logging
+Created directory: /var/lib/net-snmp/mib_indexes
+Installing cakephp/app (3.0.3)
+  - Installing cakephp/app (3.0.3)
+    Downloading: 100%         
+
+Created project in cakeapp1
+Loading composer repositories with package information
+Installing dependencies (including require-dev)
+  - Installing aura/installer-default (1.0.0)
+    Downloading: 100%         
+
+  - Installing cakephp/plugin-installer (0.0.11)
+    Downloading: 100%         
+
+  - Installing psr/log (1.0.0)
+    Downloading: 100%         
+
+  - Installing nesbot/carbon (1.13.0)
+    Downloading: 100%         
+
+  - Installing mobiledetect/mobiledetectlib (2.8.13)
+    Downloading: 100%         
+
+  - Installing aura/intl (1.1.1)
+    Downloading: 100%         
+
+  - Installing ircmaxell/password-compat (v1.0.4)
+    Downloading: 100%         
+
+  - Installing cakephp/cakephp (3.0.6)
+    Downloading: 100%         
+
+  - Installing symfony/yaml (v2.6.9)
+    Downloading: 100%         
+
+  - Installing symfony/filesystem (v2.7.0)
+    Downloading: 100%         
+
+  - Installing symfony/config (v2.6.9)
+    Downloading: 100%         
+
+  - Installing symfony/console (v2.6.9)
+    Downloading: 100%         
+
+  - Installing robmorgan/phinx (v0.4.3)
+    Downloading: 100%         
+
+  - Installing cakephp/migrations (1.1.2)
+    Downloading: 100%         
+
+  - Installing jakub-onderka/php-console-color (0.1)
+    Downloading: 100%         
+
+  - Installing jakub-onderka/php-console-highlighter (v0.3.1)
+    Downloading: 100%         
+
+  - Installing dnoegel/php-xdg-base-dir (0.1)
+    Downloading: 100%         
+
+  - Installing nikic/php-parser (v1.3.0)
+    Downloading: 100%         
+
+  - Installing psy/psysh (v0.4.4)
+    Downloading: 100%         
+
+  - Installing cakephp/debug_kit (3.1.5)
+    Downloading: 100%         
+
+  - Installing cakephp/bake (1.0.9)
+    Downloading: 100%         
+
+symfony/console suggests installing symfony/event-dispatcher ()
+symfony/console suggests installing symfony/process ()
+psy/psysh suggests installing ext-posix (If you have PCNTL, you'll want the POSIX extension as well.)
+psy/psysh suggests installing ext-pdo-sqlite (The doc command requires SQLite to work.)
+cakephp/debug_kit suggests installing ext-sqlite (DebugKit needs to store panel data in a database. SQLite is simple and easy to use.)
+Writing lock file
+Generating autoload files
+Created `config/app.php` file
+Set Folder Permissions ? (Default to Y) [Y,n]? 
+Permissions set on /var/www/html/cakeapp1/tmp/cache
+Permissions set on /var/www/html/cakeapp1/tmp/cache/models
+Permissions set on /var/www/html/cakeapp1/tmp/cache/persistent
+Permissions set on /var/www/html/cakeapp1/tmp/cache/views
+Permissions set on /var/www/html/cakeapp1/tmp/sessions
+Permissions set on /var/www/html/cakeapp1/tmp/tests
+Permissions set on /var/www/html/cakeapp1/tmp
+Permissions set on /var/www/html/cakeapp1/logs
+Updated Security.salt value in config/app.php
+
+
+echo "extension=intl.so" > /etc/php.d/intl.ini
+
+
+cd cakeapp1
+chmod 777 -R tmp
+chmod 777 -R logs
+
+
+http://localhost/cakeapp1へアクセスすると
+CakePHPの画面が表示されること
+
+emacs /var/www/html/cakeapp1/webroot/.htaccess
+へ以下を追記する
+php_flag display_errors On
+
+
+service httpd restart
+
+
+

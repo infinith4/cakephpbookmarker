@@ -1,0 +1,206 @@
+wget http://yum.pgsqlrpms.org/reporpms/8.3/pgdg-centos-8.3-2.noarch.rpm
+
+ずばっと持ってきた。
+
+# rpm -ivh pgdg-centos-8.3-2.noarch.rpm
+
+うにゃっと入れてみた。
+
+# vi /etc/yum.repos.d/CentOS-Base.repo
+
+以下の赤色の部分を追記
+
+[base]
+name=CentOS-$releasever - Base
+
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever
+
+&arch=$basearch&repo=os
+
+#baseurl=http://mirror.centos.org/centos/$releasever/os/
+
+$basearch/gpgcheck=1
+
+gpgkey=http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-5
+
+exclude=postgresql*
+
+
+#released updates
+
+
+[updates]
+name=CentOS-$releasever - Updates
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever &arch=$basearch&repo=updates
+#baseurl=http://mirror.centos.org/centos/$releasever/updates/ $basearch/
+gpgcheck=1
+gpgkey=http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-5
+exclude=postgresql*
+
+#packages used/produced in the build but not released
+要りそうなものかき集めてみる。
+
+# yum install postgresql-devel postgresql-odbc postgresql-server
+ postgresql-contrib postgresql-docs postgresql-jdbc
+
+# yum update
+
+# service postgresql start
+
+すると怒られた。パンチ！
+
+/var/lib/pgsql/data is missing. Use "service postgresql initdb" 
+to initialize the cluster first.
+
+
+
+
+
+
+                                                           [失敗]
+
+
+# service postgresql initdb
+
+データベースを初期化中:                                    [  OK  ]
+
+できた。
+
+# service postgresql start
+
+postgresql サービスを開始中:                               [  OK  ]
+
+# su - postgres
+
+-bash-3.1$ psql
+
+
+上記でプロンプトのところに「postgres=#」と表示されていますが、「postgres」の部分が現在接続しているデータベース名となります。また「#」となっている場合は、現在スーパーユーザー名でログインしていることを表しています。 
+
+postgres=# create database sample;
+CREATE DATABASE
+上記のように「CREATE DATABASE」と表示されれば無事作成が完了しています。データベース一覧で確認してみましょう。 
+postgres=# \l
+                                         データベース一覧
+   名前    |  所有者  | エンコーディング |  照合順序   | Ctype(変換演算子) |      アクセス権       
+-----------+----------+------------------+-------------+-------------------+-----------------------
+ postgres  | postgres | UTF8             | ja_JP.UTF-8 | ja_JP.UTF-8       | 
+ sample    | postgres | UTF8             | ja_JP.UTF-8 | ja_JP.UTF-8       | 
+ template0 | postgres | UTF8             | ja_JP.UTF-8 | ja_JP.UTF-8       | =c/postgres
+                                                                           : postgres=CTc/postgres
+ template1 | postgres | UTF8             | ja_JP.UTF-8 | ja_JP.UTF-8       | =c/postgres
+                                                                           : postgres=CTc/postgres
+(4 行)
+
+http://www.dbonline.jp/postgresql/database/index2.html
+
+
+
+postgres=# \connect sample 
+psql (8.4.20)
+データベース "sample" に接続しました。.
+sample=# \dt
+リレーションがありません。
+sample=# create table test (id integer,name text)
+sample-# ;
+CREATE TABLE
+sample=# \dt
+          リレーションの一覧
+ スキーマ | 名前 |    型    |  所有者  
+----------+------+----------+----------
+ public   | test | テーブル | postgres
+
+
+sample=# insert into test (id) values (1);
+INSERT 0 1
+sample=# select *  from test
+;
+ id | name 
+----+------
+  1 | 
+(1 行)
+
+sample=# update test set name='aaaaaaa' where id=1;
+UPDATE 1
+sample=# select *  from test
+;
+ id |  name   
+----+---------
+  1 | aaaaaaa
+(1 行)
+
+
+
+
+
+
+
+
+
+==============================================================
+[th4@localhost ~]$ su -
+パスワード:
+[root@localhost ~]# su - postgres
+-bash-4.1$ createuser th4
+新しいロールをスーパーユーザとしますか?  (y/n)y
+-bash-4.1$ exit
+logout
+[root@localhost ~]# createdb cakephpbookmarkdb
+createdb: データベースpostgresに接続できませんでした: FATAL:  ユーザ"root"のIdent認証に失敗しました
+"[root@localhost ~]#exit
+logout
+[th4@localhost ~]$ createdb cakephpbookmarkdb
+[th4@localhost ~]$ psql cakephpbookmarkdb
+psql (8.4.20)
+"help" でヘルプを表示します.
+
+cakephpbookmarkdb=# \connect cakephpbookmarkdb 
+psql (8.4.20)
+データベース "cakephpbookmarkdb" に接続しました。.
+
+
+
+CREATE TABLE users (
+    id INT SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created timestamp,
+    modified timestamp
+);
+
+CREATE TABLE bookmarks (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(50),
+    description TEXT,
+    url TEXT,
+    created timestamp,
+    modified timestamp
+);
+
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    created timestamp,
+    modified timestamp
+);
+
+
+CREATE TABLE bookmarks_tags (
+    bookmark_id INT NOT NULL,
+    tag_id INT NOT NULL,
+    PRIMARY KEY (bookmark_id, tag_id)
+);
+
+/var/lib/pgsql/data/pg_hba.conf の
+
+# "local" is for Unix domain socket connections only
+local   all         all                               trust
+# IPv4 local connections:
+host    all         all         127.0.0.1/32          trust
+# IPv6 local connections:
+host    all         all         ::1/128               trust
+
+とした
+
+

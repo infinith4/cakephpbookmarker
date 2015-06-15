@@ -1,0 +1,26 @@
+
+
+http://yum.postgresql.org/repopackages.php
+
+
+wget http://yum.postgresql.org/8.3/redhat/rhel-5-x86_64/pgdg-centos-8.3-7.noarch.rpm
+sudo rpm -ivh pgdg-centos-8.3-7.noarch.rpm
+sudo yum install postgresql83-server postgresql83-contrib
+
+
+
+http://yum.postgresql.org/8.3/redhat/rhel-5-x86_64/repoview/
+から一つ一つDownloadする。
+
+
+opensslをソフトウェアアップロードからインストール
+
+yum install readline-devel
+
+
+
+6.5では8.3無理そうなので
+sudo yum install postgresql-devel postgresql-odbc postgresql-server
+ postgresql-contrib postgresql-docs postgresql-jdbc
+#install 8.4.20 
+

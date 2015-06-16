@@ -39,6 +39,7 @@ class AppController extends Controller
         parent::initialize();
         $this->loadComponent('Flash'); //read component?
         $this->loadComponent('Auth', [
+						'authorize'=> 'Controller',//added this line
             'authenticate' => [
                 'Form' => [
                     'fields' => [
@@ -58,4 +59,8 @@ class AppController extends Controller
         $this->Auth->allow(['display']);
 
     }
+		public function isAuthorized($user)
+		{
+			return false;
+		}
 }
